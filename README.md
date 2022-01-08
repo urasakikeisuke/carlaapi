@@ -1,2 +1,1 @@
-# CARLA API
 # carlaapi
