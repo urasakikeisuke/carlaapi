@@ -1,6 +1,9 @@
 """setup.py"""
 
-import setuptools  # type: ignore
+import pkg_resources
+import setuptools # type: ignore
+
+pkg_resources.require(['pip >= 21.3.1'])
 
 with open("README.md", "r") as f:
     long_description = f.read()
