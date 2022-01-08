@@ -135,20 +135,20 @@ class CarlaAPI():
             settings (Dict[str, Any]): World setting dictionary
         """
 
-        settings: carla.WorldSettings = self.__world.get_settings()
+        world_settings: carla.WorldSettings = self.__world.get_settings()
 
-        settings.synchronous_mode = True
-        settings.no_rendering_mode = settings[WORLD_SETTINGS_NO_RENDERING_MODE]
-        settings.fixed_delta_seconds = settings[WORLD_SETTINGS_FIXED_DELTA_SECONDS]
-        settings.substepping = settings[WORLD_SETTINGS_SUBSTEPPING]
-        settings.max_substep_delta_time = settings[WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME]
-        settings.max_substeps = settings[WORLD_SETTINGS_MAX_SUBSTEPS]
-        settings.max_culling_distance = settings[WORLD_SETTINGS_MAX_CULLING_DISTANCE]
-        settings.deterministic_ragdolls = settings[WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS]
-        settings.tile_stream_distance = settings[WORLD_SETTINGS_TILE_STREAM_DISTANCE]
-        settings.actor_active_distance = settings[WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE]
+        world_settings.synchronous_mode = True
+        world_settings.no_rendering_mode = settings[WORLD_SETTINGS_NO_RENDERING_MODE]
+        world_settings.fixed_delta_seconds = settings[WORLD_SETTINGS_FIXED_DELTA_SECONDS]
+        world_settings.substepping = settings[WORLD_SETTINGS_SUBSTEPPING]
+        world_settings.max_substep_delta_time = settings[WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME]
+        world_settings.max_substeps = settings[WORLD_SETTINGS_MAX_SUBSTEPS]
+        world_settings.max_culling_distance = settings[WORLD_SETTINGS_MAX_CULLING_DISTANCE]
+        world_settings.deterministic_ragdolls = settings[WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS]
+        world_settings.tile_stream_distance = settings[WORLD_SETTINGS_TILE_STREAM_DISTANCE]
+        world_settings.actor_active_distance = settings[WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE]
 
-        self.__world.apply_settings(settings)
+        self.__world.apply_settings(world_settings)
 
     def __get_map(self) -> carla.Map:
         return self.__world.get_map()
