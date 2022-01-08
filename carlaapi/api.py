@@ -40,7 +40,7 @@ class CarlaAPI():
         validate_type(map_name, str)
         validate_type(seed, int)
         validate_type(reset_settings, bool)
-        validate_type(timeout, int); validate_type(timeout, float)
+        validate_type(timeout, (int, float))
 
         self.__seed = seed
         random.seed(self.__seed)
