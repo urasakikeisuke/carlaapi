@@ -138,15 +138,15 @@ class CarlaAPI():
         world_settings: carla.WorldSettings = self.__world.get_settings()
 
         world_settings.synchronous_mode = True
-        world_settings.no_rendering_mode = settings[WORLD_SETTINGS_NO_RENDERING_MODE]
-        world_settings.fixed_delta_seconds = settings[WORLD_SETTINGS_FIXED_DELTA_SECONDS]
-        world_settings.substepping = settings[WORLD_SETTINGS_SUBSTEPPING]
-        world_settings.max_substep_delta_time = settings[WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME]
-        world_settings.max_substeps = settings[WORLD_SETTINGS_MAX_SUBSTEPS]
-        world_settings.max_culling_distance = settings[WORLD_SETTINGS_MAX_CULLING_DISTANCE]
-        world_settings.deterministic_ragdolls = settings[WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS]
-        world_settings.tile_stream_distance = settings[WORLD_SETTINGS_TILE_STREAM_DISTANCE]
-        world_settings.actor_active_distance = settings[WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE]
+        world_settings.no_rendering_mode = settings[WORLD_SETTINGS_NO_RENDERING_MODE] if settings.get(WORLD_SETTINGS_NO_RENDERING_MODE) is not None else False
+        world_settings.fixed_delta_seconds = settings[WORLD_SETTINGS_FIXED_DELTA_SECONDS] if settings.get(WORLD_SETTINGS_FIXED_DELTA_SECONDS) is not None else 0.1
+        world_settings.substepping = settings[WORLD_SETTINGS_SUBSTEPPING] if settings.get(WORLD_SETTINGS_SUBSTEPPING) is not None else True
+        world_settings.max_substep_delta_time = settings[WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME] if settings.get(WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME) is not None else 0.01
+        world_settings.max_substeps = settings[WORLD_SETTINGS_MAX_SUBSTEPS] if settings.get(WORLD_SETTINGS_MAX_SUBSTEPS) is not None else 10
+        world_settings.max_culling_distance = settings[WORLD_SETTINGS_MAX_CULLING_DISTANCE] if settings.get(WORLD_SETTINGS_MAX_CULLING_DISTANCE) is not None else 0.0
+        world_settings.deterministic_ragdolls = settings[WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS] if settings.get(WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS) is not None else True
+        world_settings.tile_stream_distance = settings[WORLD_SETTINGS_TILE_STREAM_DISTANCE] if settings.get(WORLD_SETTINGS_TILE_STREAM_DISTANCE) is not None else 80.0
+        world_settings.actor_active_distance = settings[WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE] if settings.get(WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE) is not None else 80.0
 
         self.__world.apply_settings(world_settings)
 
@@ -169,11 +169,11 @@ class CarlaAPI():
             settings (Dict[str, Any]): Traffic manager setting dictionary
         """
 
-        self.__traffic_manager.set_global_distance_to_leading_vehicle(settings[TM_SETTINGS_GLOBAL_DISTANCE_TO_LEADING_VEHICLE])
-        self.__traffic_manager.set_hybrid_physics_mode(settings[TM_SETTINGS_HYBRID_PHYSICS_MODE])
-        self.__traffic_manager.set_hybrid_physics_radius(settings[TM_SETTINGS_HYBRID_PHYSICS_RADIUS])
-        self.__traffic_manager.set_respawn_dormant_vehicles(settings[TM_SETTINGS_RESPAWN_DORMANT_VEHICLES])
-        self.__traffic_manager.global_percentage_speed_difference(settings[TM_SETTINGS_GLOBAL_PERCENTAGE_SPEED_DIFFERENCE])
+        self.__traffic_manager.set_global_distance_to_leading_vehicle(settings[TM_SETTINGS_GLOBAL_DISTANCE_TO_LEADING_VEHICLE] if settings.get(TM_SETTINGS_GLOBAL_DISTANCE_TO_LEADING_VEHICLE) is not None else 10.0)
+        self.__traffic_manager.set_hybrid_physics_mode(settings[TM_SETTINGS_HYBRID_PHYSICS_MODE] if settings.get(TM_SETTINGS_HYBRID_PHYSICS_MODE) is not None else True)
+        self.__traffic_manager.set_hybrid_physics_radius(settings[TM_SETTINGS_HYBRID_PHYSICS_RADIUS] if settings.get(TM_SETTINGS_HYBRID_PHYSICS_RADIUS) is not None else 80.0)
+        self.__traffic_manager.set_respawn_dormant_vehicles(settings[TM_SETTINGS_RESPAWN_DORMANT_VEHICLES] if settings.get(TM_SETTINGS_RESPAWN_DORMANT_VEHICLES) is not None else True)
+        self.__traffic_manager.global_percentage_speed_difference(settings[TM_SETTINGS_GLOBAL_PERCENTAGE_SPEED_DIFFERENCE] if settings.get(TM_SETTINGS_GLOBAL_PERCENTAGE_SPEED_DIFFERENCE) is not None else 10.0)
     
     def tick(self, tolerance: float = 10.0) -> int:
         r"""Send the tick, and give way to the server. It returns the ID of the new frame computed by the server.
