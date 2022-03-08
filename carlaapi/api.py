@@ -150,6 +150,11 @@ class CarlaAPI():
 
         self.__world.apply_settings(world_settings)
 
+    def set_weather(self, weather: carla.WeatherParameters) -> bool:
+        self.__world.set_weather(weather)
+
+        return True
+
     def __get_map(self) -> carla.Map:
         return self.__world.get_map()
 
