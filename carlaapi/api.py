@@ -502,7 +502,7 @@ class CarlaAPI():
         validate_type(queue, Queue)
         validate_type(sensor_type, str)
 
-        processed_data: Optional[Union[numpy.ndarray, SemanticLidar_T]] = None
+        processed_data: Optional[Union[numpy.ndarray, SemanticLidar_t]] = None
         if sensor_type == SENSOR_TYPE_RGB:
             processed_data = process_rgb_data(data)
         

@@ -37,8 +37,8 @@ def process_lidar_ray_cast_data(data: carla.LidarMeasurement) -> numpy.ndarray:
 
     return points
 
-SemanticLidar_T= Tuple[Tuple[numpy.ndarray, numpy.ndarray], carla.SemanticLidarMeasurement]
-def process_lidar_ray_cast_semantic_data(data: carla.SemanticLidarMeasurement) -> SemanticLidar_T:
+SemanticLidar_t= Tuple[Tuple[numpy.ndarray, numpy.ndarray], carla.SemanticLidarMeasurement]
+def process_lidar_ray_cast_semantic_data(data: carla.SemanticLidarMeasurement) -> SemanticLidar_t:
     raw_points: numpy.ndarray = numpy.copy(numpy.frombuffer(
         data.raw_data, 
         dtype=numpy.dtype([('x', numpy.float32), ('y', numpy.float32), ('z', numpy.float32), ('CosAngle', numpy.float32), ('ObjIdx', numpy.uint32), ('ObjTag', numpy.uint32)])
