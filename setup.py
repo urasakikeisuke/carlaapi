@@ -15,7 +15,7 @@ AUTHOR_EMAIL = 'urasakikeisuke.ml@gmail.com'
 URL = 'https://github.com/urasakikeisuke/carlaapi.git'
 LICENSE = 'MIT License'
 DOWNLOAD_URL = 'https://github.com/urasakikeisuke/carlaapi.git'
-VERSION = "1.2.0"
+VERSION = "1.3.0"
 PYTHON_REQUIRES = ">=3.6"
 INSTALL_REQUIRES = [
     "numpy",
