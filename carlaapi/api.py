@@ -12,7 +12,16 @@ from .constants import *
 from .sensor_data import *
 
 
-def check_server_health(ip_address: str, tcp_port: int, timeout: float = 10.0) -> bool:
+def check_server_health(ip_address: str, tcp_port: int, timeout: float = 5.0) -> bool:
+    validate_type(ip_address, str)
+
+    try:
+        tcp_port = int(tcp_port)
+        timeout = float(timeout)
+    except ValueError:
+        validate_type(tcp_port, int)
+        validate_type(timeout, (int, float))
+
     client = carla.Client(host=ip_address, port=tcp_port)
     client.set_timeout(timeout)
 
