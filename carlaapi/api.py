@@ -26,11 +26,11 @@ def check_server_health(ip_address: str, tcp_port: int, timeout: float = 5.0) ->
     client.set_timeout(timeout)
 
     try:
-        client.get_server_version()
+        version: bool = client.get_client_version() == client.get_server_version()
     except RuntimeError:
         return False
     else:
-        return True
+        return version
 
 
 class CarlaAPI():
