@@ -26,6 +26,27 @@ def check_server_health(ip_address: str, tcp_port: int, timeout: float = 5.0) ->
     client.set_timeout(timeout)
 
     try:
+        client.get_server_version()
+    except RuntimeError:
+        return False
+    else:
+        return True
+
+
+def check_version_match(ip_address: str, tcp_port: int, timeout: float = 5.0) -> bool:
+    validate_type(ip_address, str)
+
+    try:
+        tcp_port = int(tcp_port)
+        timeout = float(timeout)
+    except ValueError:
+        validate_type(tcp_port, int)
+        validate_type(timeout, (int, float))
+
+    client = carla.Client(host=ip_address, port=tcp_port)
+    client.set_timeout(timeout)
+
+    try:
         version: bool = client.get_client_version() == client.get_server_version()
     except RuntimeError:
         return False
@@ -66,7 +87,8 @@ class CarlaAPI():
         self.__seed = seed
         random.seed(self.__seed)
 
-        self.__client: Optional[carla.Client] = carla.Client(host=ip_address, port=tcp_port)
+        self.__client: Optional[carla.Client] = carla.Client(
+            host=ip_address, port=tcp_port)
         self.__client.set_timeout(timeout)
 
         self.__load_world(map_name, reset_settings, map_layer)
@@ -131,7 +153,8 @@ class CarlaAPI():
         available_maps: List[str] = self.get_available_maps()
 
         if map_name not in available_maps:
-            raise ValueError(f"Specified map `{map_name}` is unavailable. Available maps are {available_maps}") # TODO
+            raise ValueError(
+                f"Specified map `{map_name}` is unavailable. Available maps are {available_maps}")  # TODO
 
         if map_layer is not None and "Opt" not in map_name:
             map_layer = carla.MapLayer.All
@@ -142,7 +165,8 @@ class CarlaAPI():
         available_map_layers = self.get_available_map_layers()
 
         if map_layer not in available_map_layers:
-            raise ValueError(f"Specified map layer `{map_name}` is unavailable") # TODO
+            raise ValueError(
+                f"Specified map layer `{map_name}` is unavailable")  # TODO
 
         self.__client.load_world(map_name, reset_settings, map_layer)
 
@@ -159,15 +183,24 @@ class CarlaAPI():
         world_settings: carla.WorldSettings = self.__world.get_settings()
 
         world_settings.synchronous_mode = True
-        world_settings.no_rendering_mode = settings[WORLD_SETTINGS_NO_RENDERING_MODE] if settings.get(WORLD_SETTINGS_NO_RENDERING_MODE) is not None else False
-        world_settings.fixed_delta_seconds = settings[WORLD_SETTINGS_FIXED_DELTA_SECONDS] if settings.get(WORLD_SETTINGS_FIXED_DELTA_SECONDS) is not None else 0.1
-        world_settings.substepping = settings[WORLD_SETTINGS_SUBSTEPPING] if settings.get(WORLD_SETTINGS_SUBSTEPPING) is not None else True
-        world_settings.max_substep_delta_time = settings[WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME] if settings.get(WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME) is not None else 0.01
-        world_settings.max_substeps = settings[WORLD_SETTINGS_MAX_SUBSTEPS] if settings.get(WORLD_SETTINGS_MAX_SUBSTEPS) is not None else 10
-        world_settings.max_culling_distance = settings[WORLD_SETTINGS_MAX_CULLING_DISTANCE] if settings.get(WORLD_SETTINGS_MAX_CULLING_DISTANCE) is not None else 0.0
-        world_settings.deterministic_ragdolls = settings[WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS] if settings.get(WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS) is not None else True
-        world_settings.tile_stream_distance = settings[WORLD_SETTINGS_TILE_STREAM_DISTANCE] if settings.get(WORLD_SETTINGS_TILE_STREAM_DISTANCE) is not None else 80.0
-        world_settings.actor_active_distance = settings[WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE] if settings.get(WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE) is not None else 80.0
+        world_settings.no_rendering_mode = settings[WORLD_SETTINGS_NO_RENDERING_MODE] if settings.get(
+            WORLD_SETTINGS_NO_RENDERING_MODE) is not None else False
+        world_settings.fixed_delta_seconds = settings[WORLD_SETTINGS_FIXED_DELTA_SECONDS] if settings.get(
+            WORLD_SETTINGS_FIXED_DELTA_SECONDS) is not None else 0.1
+        world_settings.substepping = settings[WORLD_SETTINGS_SUBSTEPPING] if settings.get(
+            WORLD_SETTINGS_SUBSTEPPING) is not None else True
+        world_settings.max_substep_delta_time = settings[WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME] if settings.get(
+            WORLD_SETTINGS_MAX_SUBSTEP_DELTA_TIME) is not None else 0.01
+        world_settings.max_substeps = settings[WORLD_SETTINGS_MAX_SUBSTEPS] if settings.get(
+            WORLD_SETTINGS_MAX_SUBSTEPS) is not None else 10
+        world_settings.max_culling_distance = settings[WORLD_SETTINGS_MAX_CULLING_DISTANCE] if settings.get(
+            WORLD_SETTINGS_MAX_CULLING_DISTANCE) is not None else 0.0
+        world_settings.deterministic_ragdolls = settings[WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS] if settings.get(
+            WORLD_SETTINGS_DETERMINISTIC_RAGDOLLS) is not None else True
+        world_settings.tile_stream_distance = settings[WORLD_SETTINGS_TILE_STREAM_DISTANCE] if settings.get(
+            WORLD_SETTINGS_TILE_STREAM_DISTANCE) is not None else 80.0
+        world_settings.actor_active_distance = settings[WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE] if settings.get(
+            WORLD_SETTINGS_ACTOR_ACTIVE_DISTANCE) is not None else 80.0
 
         self.__world.apply_settings(world_settings)
 
@@ -182,7 +215,8 @@ class CarlaAPI():
     def __get_traffic_manager(self, tcp_port: int = 8000) -> carla.TrafficManager:
         validate_type(tcp_port, int)
 
-        traffic_manager: carla.TrafficManager = self.__client.get_trafficmanager(tcp_port)
+        traffic_manager: carla.TrafficManager = self.__client.get_trafficmanager(
+            tcp_port)
         traffic_manager.set_synchronous_mode(True)
         traffic_manager.set_random_device_seed(self.__seed)
 
@@ -195,11 +229,16 @@ class CarlaAPI():
             settings (Dict[str, Any]): Traffic manager setting dictionary
         """
 
-        self.__traffic_manager.set_global_distance_to_leading_vehicle(settings[TM_SETTINGS_GLOBAL_DISTANCE_TO_LEADING_VEHICLE] if settings.get(TM_SETTINGS_GLOBAL_DISTANCE_TO_LEADING_VEHICLE) is not None else 10.0)
-        self.__traffic_manager.set_hybrid_physics_mode(settings[TM_SETTINGS_HYBRID_PHYSICS_MODE] if settings.get(TM_SETTINGS_HYBRID_PHYSICS_MODE) is not None else True)
-        self.__traffic_manager.set_hybrid_physics_radius(settings[TM_SETTINGS_HYBRID_PHYSICS_RADIUS] if settings.get(TM_SETTINGS_HYBRID_PHYSICS_RADIUS) is not None else 80.0)
-        self.__traffic_manager.set_respawn_dormant_vehicles(settings[TM_SETTINGS_RESPAWN_DORMANT_VEHICLES] if settings.get(TM_SETTINGS_RESPAWN_DORMANT_VEHICLES) is not None else True)
-        self.__traffic_manager.global_percentage_speed_difference(settings[TM_SETTINGS_GLOBAL_PERCENTAGE_SPEED_DIFFERENCE] if settings.get(TM_SETTINGS_GLOBAL_PERCENTAGE_SPEED_DIFFERENCE) is not None else 10.0)
+        self.__traffic_manager.set_global_distance_to_leading_vehicle(settings[TM_SETTINGS_GLOBAL_DISTANCE_TO_LEADING_VEHICLE] if settings.get(
+            TM_SETTINGS_GLOBAL_DISTANCE_TO_LEADING_VEHICLE) is not None else 10.0)
+        self.__traffic_manager.set_hybrid_physics_mode(settings[TM_SETTINGS_HYBRID_PHYSICS_MODE] if settings.get(
+            TM_SETTINGS_HYBRID_PHYSICS_MODE) is not None else True)
+        self.__traffic_manager.set_hybrid_physics_radius(settings[TM_SETTINGS_HYBRID_PHYSICS_RADIUS] if settings.get(
+            TM_SETTINGS_HYBRID_PHYSICS_RADIUS) is not None else 80.0)
+        self.__traffic_manager.set_respawn_dormant_vehicles(settings[TM_SETTINGS_RESPAWN_DORMANT_VEHICLES] if settings.get(
+            TM_SETTINGS_RESPAWN_DORMANT_VEHICLES) is not None else True)
+        self.__traffic_manager.global_percentage_speed_difference(settings[TM_SETTINGS_GLOBAL_PERCENTAGE_SPEED_DIFFERENCE] if settings.get(
+            TM_SETTINGS_GLOBAL_PERCENTAGE_SPEED_DIFFERENCE) is not None else 10.0)
 
     def tick(self, tolerance: float = 10.0) -> int:
         r"""Send the tick, and give way to the server. It returns the ID of the new frame computed by the server.
@@ -217,7 +256,8 @@ class CarlaAPI():
         validate_type(tolerance, (int, float))
 
         if self.__destroyed:
-            raise RuntimeError("The actor has already been destroyed. Create a new instance to avoid unexpected problems.") # TODO
+            raise RuntimeError(
+                "The actor has already been destroyed. Create a new instance to avoid unexpected problems.")  # TODO
 
         return self.__world.tick(seconds=tolerance)
 
@@ -236,7 +276,8 @@ class CarlaAPI():
             try:
                 return spawn_points[index]
             except IndexError:
-                raise IndexError(f"Specified spawn point index is out of bound") from None  # TODO
+                raise IndexError(
+                    f"Specified spawn point index is out of bound") from None  # TODO
 
     def __get_vehicle_bp(self, vehicle_name: Optional[str] = None, is_hero: bool = False, safe_spawn: bool = True) -> carla.BlueprintLibrary:
         bpl = self.__get_blueprint_library()
@@ -258,7 +299,8 @@ class CarlaAPI():
             bpl = [x for x in bpl if not x.id.endswith('ambulance')]
 
         if is_hero:
-            bpl = [x for x in bpl if int(x.get_attribute('number_of_wheels')) == 4]
+            bpl = [x for x in bpl if int(
+                x.get_attribute('number_of_wheels')) == 4]
 
         bp = random.choice(bpl)
 
@@ -268,17 +310,20 @@ class CarlaAPI():
             bp.set_attribute(BP_ATTR_ROLE_NAME, ROLE_NAME_NPC)
 
         if bp.has_attribute(BP_ATTR_COLOR):
-            color = random.choice(bp.get_attribute(BP_ATTR_COLOR).recommended_values)
+            color = random.choice(bp.get_attribute(
+                BP_ATTR_COLOR).recommended_values)
             bp.set_attribute(BP_ATTR_COLOR, color)
 
         if bp.has_attribute(BP_ATTR_DRIVER_ID):
-            driver_id = random.choice(bp.get_attribute(BP_ATTR_DRIVER_ID).recommended_values)
+            driver_id = random.choice(bp.get_attribute(
+                BP_ATTR_DRIVER_ID).recommended_values)
             bp.set_attribute(BP_ATTR_DRIVER_ID, driver_id)
 
         return bp
 
     def __spawn_vehicle_actor(self, bp: carla.BlueprintLibrary, spawn_point: carla.Transform, auto_pilot: bool = True) -> None:
-        actor: Optional[carla.Actor] = self.__world.try_spawn_actor(bp, spawn_point)
+        actor: Optional[carla.Actor] = self.__world.try_spawn_actor(
+            bp, spawn_point)
 
         if actor is not None:
             actor.set_autopilot(auto_pilot)
@@ -296,7 +341,7 @@ class CarlaAPI():
                 actor_attrs[SPAWNED_ACTORS_ATTR] = SPAWNED_ACTORS_ATTR_NPC_VEHICLE
 
             else:
-                raise ValueError() # TODO
+                raise ValueError()  # TODO
 
             self.__traffic_manager.update_vehicle_lights(actor, True)
             self.__traffic_manager.ignore_lights_percentage(actor, 1.0)
@@ -313,7 +358,8 @@ class CarlaAPI():
         """
 
         spawn_point = self.__get_vehicle_spawn_point()
-        bp = self.__get_vehicle_bp(vehicle_name, is_hero=True, safe_spawn=False)
+        bp = self.__get_vehicle_bp(
+            vehicle_name, is_hero=True, safe_spawn=False)
 
         self.__spawn_vehicle_actor(bp, spawn_point, safe_spawn)
 
@@ -457,21 +503,25 @@ class CarlaAPI():
 
             if bp.has_attribute(BP_ATTR_SPEED):
                 if (random.random() > running_pedestrians_perc):
-                    _rcmd_pedestrian_speeds.append(bp.get_attribute(BP_ATTR_SPEED).recommended_values[1])
+                    _rcmd_pedestrian_speeds.append(
+                        bp.get_attribute(BP_ATTR_SPEED).recommended_values[1])
                 else:
-                    _rcmd_pedestrian_speeds.append(bp.get_attribute(BP_ATTR_SPEED).recommended_values[2])
+                    _rcmd_pedestrian_speeds.append(
+                        bp.get_attribute(BP_ATTR_SPEED).recommended_values[2])
             else:
                 _rcmd_pedestrian_speeds.append(0.0)
 
             batch.append(carla.command.SpawnActor(bp, spawn_point))
 
-        responses: List[carla.command.Response] = self.__client.apply_batch_sync(batch, True)
+        responses: List[carla.command.Response] = self.__client.apply_batch_sync(
+            batch, True)
 
         rcmd_pedestrian_speeds = []
 
         for i, response in enumerate(responses):
             if not response.error:
-                self.__pedestrian_actor_ids.append({SPAWNED_PEDESTRIAN_BODY_ID: response.actor_id})
+                self.__pedestrian_actor_ids.append(
+                    {SPAWNED_PEDESTRIAN_BODY_ID: response.actor_id})
                 rcmd_pedestrian_speeds.append(_rcmd_pedestrian_speeds[i])
 
         return rcmd_pedestrian_speeds
@@ -481,9 +531,11 @@ class CarlaAPI():
         bp = self.__get_pedestrian_bp(filter="controller.ai.walker")
 
         for pedestrian_actor_id in self.__pedestrian_actor_ids:
-            batch.append(carla.command.SpawnActor(bp, carla.Transform(), pedestrian_actor_id[SPAWNED_PEDESTRIAN_BODY_ID]))
+            batch.append(carla.command.SpawnActor(
+                bp, carla.Transform(), pedestrian_actor_id[SPAWNED_PEDESTRIAN_BODY_ID]))
 
-        responses: List[carla.command.Response] = self.__client.apply_batch_sync(batch, True)
+        responses: List[carla.command.Response] = self.__client.apply_batch_sync(
+            batch, True)
         for i, response in enumerate(responses):
             if not response.error:
                 self.__pedestrian_actor_ids[i][SPAWNED_PEDESTRIAN_CONTROLLER_ID] = response.actor_id
@@ -492,10 +544,12 @@ class CarlaAPI():
         self.tick()
 
         for pedestrian_actor_id, pedestrian_speed in zip(self.__pedestrian_actor_ids, pedestrian_speeds):
-            controller_actor: carla.Actor = self.__world.get_actor(pedestrian_actor_id[SPAWNED_PEDESTRIAN_CONTROLLER_ID])
+            controller_actor: carla.Actor = self.__world.get_actor(
+                pedestrian_actor_id[SPAWNED_PEDESTRIAN_CONTROLLER_ID])
 
             controller_actor.start()
-            controller_actor.go_to_location(self.__world.get_random_location_from_navigation())
+            controller_actor.go_to_location(
+                self.__world.get_random_location_from_navigation())
             controller_actor.set_max_speed(float(pedestrian_speed))
 
     def spawn_pedestrians(self, n: int, running_pedestrians_perc: float = 10.0) -> None:
@@ -509,7 +563,8 @@ class CarlaAPI():
         self.__world.set_pedestrians_seed(self.__seed)
 
         spawn_points = self.__get_pedestrian_spawn_points(n)
-        rcmd_pedestrian_speeds = self.__spawn_pedestrian_bodys(spawn_points, running_pedestrians_perc)
+        rcmd_pedestrian_speeds = self.__spawn_pedestrian_bodys(
+            spawn_points, running_pedestrians_perc)
         self.__spawn_pedestrian_controllers()
 
         self.__spawn_pedestrians(rcmd_pedestrian_speeds)
@@ -548,16 +603,15 @@ class CarlaAPI():
             processed_data = process_lidar_ray_cast_semantic_data(data)
 
         elif sensor_type == SENSOR_TYPE_GNSS:
-            raise NotImplementedError() # TODO
+            raise NotImplementedError()  # TODO
 
         elif sensor_type == SENSOR_TYPE_IMU:
-            raise NotImplementedError() # TODO
+            raise NotImplementedError()  # TODO
 
         else:
-            raise NotImplementedError() # TODO
+            raise NotImplementedError()  # TODO
 
         queue.put_nowait(processed_data)
-
 
     def spawn_sensor_actor(self, parent_actor: carla.Actor, sensor_type: str,
                            sensor_definitions: Dict[str, Any]) -> Dict[str, Union[str, dict, Queue]]:
@@ -581,34 +635,50 @@ class CarlaAPI():
 
         bp = self.__get_sensor_bp(sensor_type)
         if bp is None:
-            raise NameError(f"Could not find specified sensor `{sensor_type}`")  # TODO
+            raise NameError(
+                f"Could not find specified sensor `{sensor_type}`")  # TODO
 
-        sensor_definitions_common = get_item(sensor_definitions, SENSOR_DEFINITIONS_COMMON)
-        sensor_definitions_sensor_id = get_item(sensor_definitions_common, SENSOR_DEFINITIONS_COMMON_ID)
-        sensor_definitions_sensor_type = get_item(sensor_definitions_common, SENSOR_DEFINITIONS_COMMON_TYPE)
+        sensor_definitions_common = get_item(
+            sensor_definitions, SENSOR_DEFINITIONS_COMMON)
+        sensor_definitions_sensor_id = get_item(
+            sensor_definitions_common, SENSOR_DEFINITIONS_COMMON_ID)
+        sensor_definitions_sensor_type = get_item(
+            sensor_definitions_common, SENSOR_DEFINITIONS_COMMON_TYPE)
 
         if sensor_type != sensor_definitions_sensor_type:
-            raise NameError("Specified sensor type and sensor type in the definition are not match") # TODO
+            raise NameError(
+                "Specified sensor type and sensor type in the definition are not match")  # TODO
 
-        sensor_definitions_transform: Dict[str, float] = get_item(sensor_definitions, SENSOR_DEFINITIONS_TRANSFORM)
-        sensor_definitions_transform_x: float = get_item(sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_X)
-        sensor_definitions_transform_y: float = get_item(sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_Y)
-        sensor_definitions_transform_z: float = get_item(sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_Z)
-        sensor_definitions_transform_roll: float = get_item(sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_ROLL)
-        sensor_definitions_transform_pitch: float = get_item(sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_PITCH)
-        sensor_definitions_transform_yaw: float = get_item(sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_YAW)
+        sensor_definitions_transform: Dict[str, float] = get_item(
+            sensor_definitions, SENSOR_DEFINITIONS_TRANSFORM)
+        sensor_definitions_transform_x: float = get_item(
+            sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_X)
+        sensor_definitions_transform_y: float = get_item(
+            sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_Y)
+        sensor_definitions_transform_z: float = get_item(
+            sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_Z)
+        sensor_definitions_transform_roll: float = get_item(
+            sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_ROLL)
+        sensor_definitions_transform_pitch: float = get_item(
+            sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_PITCH)
+        sensor_definitions_transform_yaw: float = get_item(
+            sensor_definitions_transform, SENSOR_DEFINITIONS_TRANSFORM_YAW)
 
         carla_transform: carla.Transform = carla.Transform(
-            carla.Location(x=sensor_definitions_transform_x, y=sensor_definitions_transform_y, z=sensor_definitions_transform_z),
-            carla.Rotation(roll=sensor_definitions_transform_roll, pitch=sensor_definitions_transform_pitch, yaw=sensor_definitions_transform_yaw)
-        ) # left-handed
+            carla.Location(x=sensor_definitions_transform_x,
+                           y=sensor_definitions_transform_y, z=sensor_definitions_transform_z),
+            carla.Rotation(roll=sensor_definitions_transform_roll,
+                           pitch=sensor_definitions_transform_pitch, yaw=sensor_definitions_transform_yaw)
+        )  # left-handed
 
-        sensor_definitions_configs: Dict[str, Any] = get_item(sensor_definitions, SENSOR_DEFINITIONS_CONFIG)
+        sensor_definitions_configs: Dict[str, Any] = get_item(
+            sensor_definitions, SENSOR_DEFINITIONS_CONFIG)
         for key, value in sensor_definitions_configs.items():
             try:
                 bp.set_attribute(key, str(value))
             except IndexError:
-                raise IndexError(f"Blueprint has not attribute `{key}`") from None # TODO
+                raise IndexError(
+                    f"Blueprint has not attribute `{key}`") from None  # TODO
 
         bp.set_attribute(BP_ATTR_SENSOR_TICK, "0.0")
 
@@ -620,7 +690,8 @@ class CarlaAPI():
             cx: float = width / 2.0
             cy: float = height / 2.0
 
-            focal: float = width / (2.0 * math.tan(bp.get_attribute(BP_ATTR_FOV).as_float() * math.pi / 360.0))
+            focal: float = width / \
+                (2.0 * math.tan(bp.get_attribute(BP_ATTR_FOV).as_float() * math.pi / 360.0))
 
             intrinsic = {
                 INTRINSIC_WIDTH: width,
@@ -632,8 +703,10 @@ class CarlaAPI():
 
         queue: Queue = Queue(maxsize=1)
 
-        actor: carla.Actor = self.__world.spawn_actor(bp, carla_transform, attach_to=parent_actor)
-        actor.listen(lambda data: self.__sensor_callback(data, queue, sensor_type))
+        actor: carla.Actor = self.__world.spawn_actor(
+            bp, carla_transform, attach_to=parent_actor)
+        actor.listen(lambda data: self.__sensor_callback(
+            data, queue, sensor_type))
 
         self.__spawned_sensor_actors.append(actor)
 
@@ -655,15 +728,18 @@ class CarlaAPI():
                 spawned_sensor_actor.destroy()
 
             for spawned_vehicle_actor in self.__spawned_vehicle_actors:
-                vehicle_actor = self.__world.get_actor(spawned_vehicle_actor[SPAWNED_ACTORS_ACTOR_ID])
+                vehicle_actor = self.__world.get_actor(
+                    spawned_vehicle_actor[SPAWNED_ACTORS_ACTOR_ID])
                 vehicle_actor.destroy()
 
             for pedestrian_actor_id in self.__pedestrian_actor_ids:
-                controller_actor: carla.Actor = self.__world.get_actor(pedestrian_actor_id[SPAWNED_PEDESTRIAN_CONTROLLER_ID])
+                controller_actor: carla.Actor = self.__world.get_actor(
+                    pedestrian_actor_id[SPAWNED_PEDESTRIAN_CONTROLLER_ID])
                 controller_actor.stop()
                 controller_actor.destroy()
 
-                body_actor: carla.Actor = self.__world.get_actor(pedestrian_actor_id[SPAWNED_PEDESTRIAN_BODY_ID])
+                body_actor: carla.Actor = self.__world.get_actor(
+                    pedestrian_actor_id[SPAWNED_PEDESTRIAN_BODY_ID])
                 body_actor.destroy()
 
             self.tick()
