@@ -33,7 +33,17 @@ def check_server_health(ip_address: str, tcp_port: int, timeout: float = 5.0) ->
         return True
 
 
-def check_version_match(ip_address: str, tcp_port: int, timeout: float = 5.0) -> bool:
+def check_version_match(ip_address: str, tcp_port: int, timeout: float = 5.0) -> Optional[Tuple[str, str, bool]]:
+    """Check and return client Python API and server verion
+
+    Args:
+        ip_address (str): Server IP Address
+        tcp_port (int): Server TCP port
+        timeout (float, optional): Timeout seconds. Defaults to 5.0.
+
+    Returns:
+        Optional[Tuple[bool, str, str]]: Return server version and client version as Tuple if connection established else None
+    """
     validate_type(ip_address, str)
 
     try:
@@ -47,11 +57,12 @@ def check_version_match(ip_address: str, tcp_port: int, timeout: float = 5.0) ->
     client.set_timeout(timeout)
 
     try:
-        version: bool = client.get_client_version() == client.get_server_version()
+        client_version = client.get_client_version()
+        server_version = client.get_server_version()
     except RuntimeError:
-        return False
+        return None
     else:
-        return version
+        return (server_version == client_version, server_version, client_version)
 
 
 class CarlaAPI():
