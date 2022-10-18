@@ -40,7 +40,7 @@ def process_lidar_ray_cast_data(data: carla.LidarMeasurement) -> numpy.ndarray:
 SemanticLidar_t= Tuple[Tuple[numpy.ndarray, numpy.ndarray], carla.SemanticLidarMeasurement]
 def process_lidar_ray_cast_semantic_data(data: carla.SemanticLidarMeasurement) -> SemanticLidar_t:
     raw_points: numpy.ndarray = numpy.copy(numpy.frombuffer(
-        data.raw_data, 
+        data.raw_data,
         dtype=numpy.dtype([('x', numpy.float32), ('y', numpy.float32), ('z', numpy.float32), ('CosAngle', numpy.float32), ('ObjIdx', numpy.uint32), ('ObjTag', numpy.uint32)])
     ))
     points: numpy.ndarray = numpy.stack([raw_points['x'], raw_points['y'], raw_points['z']], axis=1)
@@ -48,3 +48,13 @@ def process_lidar_ray_cast_semantic_data(data: carla.SemanticLidarMeasurement) -
     object_tag: numpy.ndarray = numpy.uint8(raw_points['ObjTag'])
 
     return ((points, object_tag), data)
+
+def process_gnss_data(data: carla.GnssMeasurement) -> Tuple[float, float, float]:
+    return (data.altitude, data.latitude, data.longitude)
+
+def process_imu_data(data: carla.IMUMeasurement) -> Tuple[numpy.ndarray, float, numpy.ndarray]:
+    accelerometer: numpy.ndarray = numpy.array(data.accelerometer.x, data.accelerometer.y, data.accelerometer.z)
+    compass: float = data.compass
+    gyroscope: numpy.ndarray = numpy.array(data.gyroscope.x, data.gyroscope.y, data.gyroscope.z)
+
+    return (accelerometer, compass, gyroscope)

@@ -44,6 +44,7 @@ def check_version_match(ip_address: str, tcp_port: int, timeout: float = 5.0) ->
     Returns:
         Optional[Tuple[bool, str, str]]: Return server version and client version as Tuple if connection established else None
     """
+
     validate_type(ip_address, str)
 
     try:
@@ -70,11 +71,11 @@ class CarlaAPI():
         self,
         ip_address: str,
         tcp_port: int,
-        map_name: str,
-        seed: int,
+        map_name: str = "Town01",
+        seed: int = 3407,
         reset_settings: bool = False,
         map_layer: Optional[str] = None,
-        timeout: float = 10.0,
+        timeout: float = 5.0,
     ) -> None:
         r"""CarlaAPI constructor
 
@@ -82,10 +83,10 @@ class CarlaAPI():
             ip_address (str): Carla server ip address.
             tcp_port (int): Carla server TCP port.
             map_name (str): Map name of Carla world.
-            seed (int): Simulation seed.
+            seed (int): Simulation seed. Defaults to 3407.
             reset_settings (bool, optional): Whether to reset world settings when the world re-loaded. Defaults to False.
             map_layer (Optional[str], optional): Map layer of Carla world. Defaults to None.
-            timeout (float, optional): Connection timeout seconds. Defaults to 10.0.
+            timeout (float, optional): Connection timeout seconds. Defaults to 5.0.
         """
 
         validate_type(ip_address, str)
@@ -614,10 +615,10 @@ class CarlaAPI():
             processed_data = process_lidar_ray_cast_semantic_data(data)
 
         elif sensor_type == SENSOR_TYPE_GNSS:
-            raise NotImplementedError()  # TODO
+             processed_data = process_gnss_data(data)
 
         elif sensor_type == SENSOR_TYPE_IMU:
-            raise NotImplementedError()  # TODO
+             processed_data = process_imu_data(data)
 
         else:
             raise NotImplementedError()  # TODO
