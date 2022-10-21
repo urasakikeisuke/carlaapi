@@ -448,7 +448,7 @@ class CarlaAPI():
             ACTOR_STATES_ACCELERATION_LENGTH: acceleration.length(),
         }
 
-        angular_velocity: carla.Vector3D = actor.get_acceleration()
+        angular_velocity: carla.Vector3D = actor.get_angular_velocity()
         state[ACTOR_STATES_ANGULAR_VELOCITY] = {
             ACTOR_STATES_ANGULAR_VELOCITY_X: angular_velocity.x,
             ACTOR_STATES_ANGULAR_VELOCITY_Y: angular_velocity.y,
@@ -615,10 +615,10 @@ class CarlaAPI():
             processed_data = process_lidar_ray_cast_semantic_data(data)
 
         elif sensor_type == SENSOR_TYPE_GNSS:
-             processed_data = process_gnss_data(data)
+            processed_data = process_gnss_data(data)
 
         elif sensor_type == SENSOR_TYPE_IMU:
-             processed_data = process_imu_data(data)
+            processed_data = process_imu_data(data)
 
         else:
             raise NotImplementedError()  # TODO
